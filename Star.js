@@ -1,13 +1,14 @@
 function Star() {
 
-    this.x;
-    this.y;
-    this.size;
+    this.x = random(width);
+    this.y = random(height);
+    this.size = random(1, 8);
+    this.velY = this.size;
 
     this.reset = function() {
         this.x = random(width);
         this.y = -20;
-        this.size = random(2, 10);
+        this.size = random(1, 8);
         this.velY = this.size;
     };
 

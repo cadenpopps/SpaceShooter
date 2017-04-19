@@ -3,7 +3,7 @@ var enemies;
 var lasers = [];
 var stars;
 const ENEMYAMOUNT = 30;
-const STARAMOUNT = 20;
+const STARAMOUNT = 40;
 var enemyScaleX;
 var enemyScaleY;
 
@@ -15,10 +15,10 @@ function setup() {
     stars = new Array(STARAMOUNT);
     for (var i = 0; i < ENEMYAMOUNT; i++) {
         enemies[i] = new Enemy();
+
     }
     for (var i = 0; i < STARAMOUNT; i++) {
         stars[i] = new Star();
-        stars[i].reset();
     }
 
     setInterval(update, 25);
@@ -36,9 +36,7 @@ function draw() {
     }
 
     for (let e of enemies) {
-        if (e.active) {
-            e.display();
-        }
+        e.display();
     }
 
     for (let l of lasers) {
@@ -51,15 +49,13 @@ function draw() {
 }
 
 function update() {
-    if (player.alive) {
+    if (player.alive()) {
         player.update();
         for (let e of enemies) {
-            if (e.active) {
-                e.update();
-            }
+            e.update();
         }
         for (var i = enemies.length - 1; i >= 0; i--) {
-            if (!enemies[i].active) {
+            if (!enemies[i].getAlive()) {
                 enemies.splice(i, 1);
             }
         }
@@ -67,7 +63,7 @@ function update() {
             l.update();
         }
         for (var i = lasers.length - 1; i >= 0; i--) {
-            if (!lasers[i].alive) {
+            if (!lasers[i].alive()) {
                 lasers.splice(i, 1);
             }
         }
@@ -93,7 +89,9 @@ function init() {
 }
 
 function keyTyped() {
-
+    if (keyIsDown(32)) {
+        player.fire();
+    }
 }
 
 function windowResized() {
