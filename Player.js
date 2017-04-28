@@ -65,7 +65,7 @@ function Player() {
     };
 
     this.fire = function() {
-        if (shootCoolDown <= 0) {
+        if (shootCoolDown <= 0 && alive) {
             lasers.push(new Laser(x, y - size, 0));
             shootCoolDown = 12;
         }

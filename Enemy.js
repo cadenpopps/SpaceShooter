@@ -1,18 +1,24 @@
 function Enemy() {
 
-    var x;
-    var y;
-    var size = 50;
+    const size = ENEMYSIZE;
     var moveSpeed = 10;
     var alive = false;
     var moveSide = true;
 
+    var target = createVector();
+    var pos = createVector();
+    var vel = createVector();
+    var acc = createVector();
+
+
+    // this.color = [];
+
     this.getX = function() {
-        return x;
+        return pos.x;
     };
 
     this.getY = function() {
-        return y;
+        return pos.y;
     };
 
     this.getSize = function() {
@@ -25,8 +31,8 @@ function Enemy() {
 
     this.reset = function(_x, _y) {
         if (!alive) {
-            x = _x * enemyScaleX + 30;
-            y = _y * enemyScaleY;
+            pos.x = _x * enemyScaleX + 30;
+            pos.y = _y * enemyScaleY;
             alive = true;
             moveSide = true;
         }
@@ -34,37 +40,50 @@ function Enemy() {
 
     this.update = function() {
         if (moveSide) {
-            if (frameCount % 120 < 30) {
-                x++;
-                // x += (random(.5, 1.5));
-            }
-            else if (frameCount % 120 > 90) {
-                x++;
+            if (frameCount % 120 < 30 || frameCount % 120 >= 90) {
+                pos.x++;
                 // x += (random(.5, 1.5));
             }
             else {
-                x--;
+                pos.x--;
                 // x -= (random(.5, 1.5));
             }
+
+            // if (random(1) < .05) {
+            //     pos.x++;
+            // }
+            // if (random(1) < .05) {
+            //     pos.x--;
+            // }
+            // if (random(1) < .05) {
+            //     pos.y++;
+            // }
+            // if (random(1) < .05) {
+            //     pos.y--;
+            // }
+
         }
         else {
-            if (random(1) < .5) {
-                x += moveSpeed * random(.8, 1);
-                // x += (random(.5, 1.5));
-            }
-            else {
-                x -= moveSpeed * random(.8, 1); // x -= (random(.5, 1.5));
-            }
-            y += moveSpeed;
-        }
 
-        if (random(1) < .001) {
-            moveSide = false;
-        }
+            vel.mult(.95);
 
-        if (y > height + size) {
-            y = -2 * size;
-            moveSide = true;
+            var attract = createVector(target.x, target.y);
+
+            attract.sub(pos);
+            pos.add(vel);
+            vel.add(acc);
+            // vel.x = constrain(vel.x, 0, 20);
+            // vel.y = constrain(vel.y, 0, 20);
+
+            acc = attract.mult(.001);
+
+            if (dist(pos.x, pos.y, target.x, target.y) < 2) {
+                moveSide = true;
+                target = createVector();
+                attract = createVector();
+                vel = createVector();
+                acc = createVector();
+            }
         }
 
         this.checkCollisions();
@@ -72,8 +91,8 @@ function Enemy() {
 
     this.checkCollisions = function() {
         for (let l of lasers) {
-            if (abs(x - l.getX()) + abs(y - l.getY()) < size + l.getSize()) {
-                if (dist(x, y, l.getX(), l.getY()) < size / 2 + l.getSize() / 2) {
+            if (abs(pos.x - l.getX()) + abs(pos.y - l.getY()) < size + l.getSize()) {
+                if (dist(pos.x, pos.y, l.getX(), l.getY()) < size / 2 + l.getSize() / 2) {
                     l.destroy(this);
                     alive = false;
                 }
@@ -81,16 +100,22 @@ function Enemy() {
         }
     };
 
+    this.moveTo = function(_x, _y) {
+        moveSide = false;
+        target = createVector(_x, _y);
+    };
+
     this.destroy = function() {
-        if (abs(x - player.getX()) + abs(y - player.getY()) < size + player.getSize()) {
+        if (abs(pos.x - player.getX()) + abs(pos.y - player.getY()) < size + player.getSize()) {
             alive = false;
         }
     };
 
     this.display = function() {
         if (alive) {
-            fill(200, 255, 200);
-            ellipse(x, y, size, size);
+            // fill(this.color[0], this.color[1], this.color[2]);
+            fill(200, 230, 210);
+            ellipse(pos.x, pos.y, size, size);
         }
     };
 
